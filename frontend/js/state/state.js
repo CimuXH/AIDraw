@@ -1,7 +1,8 @@
 /**
- * 场景图谱 + 全局状态管理 — 占位，阶段五实现
+ * 场景图谱 + 全局状态管理 + localStorage 持久化
  */
 const SceneGraph = (() => {
+  const STORAGE_KEY = 'aidraw_scene_graph';
   let objects = [];
   const canvasSize = { width: 1100, height: 700 };
   let version = 0;
@@ -10,6 +11,39 @@ const SceneGraph = (() => {
   let currentColor = '#000000';
   let currentStrokeWidth = 3;
   let currentFill = false;
+
+  // ---------- 持久化 ----------
+
+  function save() {
+    try {
+      const data = { objects, canvasSize, version, currentColor, currentStrokeWidth, currentFill };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {
+      console.warn('[SceneGraph] localStorage 保存失败:', e.message);
+    }
+  }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      const data = JSON.parse(raw);
+      if (!data.objects || !Array.isArray(data.objects)) return false;
+      objects = data.objects;
+      version = data.version || objects.length;
+      currentColor = data.currentColor || '#000000';
+      currentStrokeWidth = data.currentStrokeWidth || 3;
+      currentFill = data.currentFill || false;
+      console.log('[SceneGraph] 已恢复', objects.length, '个图形');
+      return true;
+    } catch (e) {
+      console.warn('[SceneGraph] 读取失败:', e.message);
+      try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+      return false;
+    }
+  }
+
+  // ---------- 生命周期 ----------
 
   function addObject(obj) {
     const newObj = {
@@ -21,12 +55,12 @@ const SceneGraph = (() => {
     };
     objects.push(newObj);
     version++;
-    console.log('[SceneGraph] 添加:', newObj.label || newObj.type);
+    save();
+    console.log('[SceneGraph] 添加:', newObj.label || newObj.type, '(总数:', objects.length, ')');
     return newObj;
   }
 
   function removeObject(id) {
-    // 级联删除子对象
     const toRemove = new Set();
     toRemove.add(id);
     let changed = true;
@@ -41,13 +75,23 @@ const SceneGraph = (() => {
     }
     objects = objects.filter(obj => !toRemove.has(obj.id));
     version++;
+    save();
   }
+
+  function clear() {
+    objects = [];
+    version++;
+    save();
+    console.log('[SceneGraph] 已清空');
+  }
+
+  // ---------- 查询 ----------
 
   function findById(id) { return objects.find(obj => obj.id === id); }
   function findByLabel(keyword) { return objects.filter(obj => obj.label && obj.label.includes(keyword)); }
   function findByType(type) { return objects.filter(obj => obj.type === type); }
   function getAll() { return [...objects]; }
-  function clear() { objects = []; version++; }
+  function getObjectCount() { return objects.length; }
 
   function toLLMContext() {
     if (objects.length === 0) return `画布尺寸:${canvasSize.width}×${canvasSize.height}\n当前无已绘制图形。`;
@@ -65,15 +109,32 @@ const SceneGraph = (() => {
     return ctx;
   }
 
+  // ---------- 工具状态 ----------
+
+  function getCurrentColor() { return currentColor; }
+  function setCurrentColor(c) { currentColor = c; save(); }
+  function getCurrentStrokeWidth() { return currentStrokeWidth; }
+  function setCurrentStrokeWidth(w) { currentStrokeWidth = w; save(); }
+  function getCurrentFill() { return currentFill; }
+  function setCurrentFill(f) { currentFill = f; save(); }
+
+  // ---------- 初始化 ----------
+
+  function init() {
+    return load();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
   return {
     addObject, removeObject, findById, findByLabel, findByType,
-    getAll, clear, toLLMContext,
-    getCurrentColor: () => currentColor,
-    setCurrentColor: (c) => { currentColor = c; },
-    getCurrentStrokeWidth: () => currentStrokeWidth,
-    setCurrentStrokeWidth: (w) => { currentStrokeWidth = w; },
-    getCurrentFill: () => currentFill,
-    setCurrentFill: (f) => { currentFill = f; },
-    getObjectCount: () => objects.length,
+    getAll, clear, toLLMContext, getObjectCount,
+    getCurrentColor, setCurrentColor,
+    getCurrentStrokeWidth, setCurrentStrokeWidth,
+    getCurrentFill, setCurrentFill,
   };
 })();

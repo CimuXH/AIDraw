@@ -78,10 +78,18 @@ const App = (() => {
       addLog('❌', `[${error}] ${message}`);
     });
 
-    // 监听麦克风按钮状态同步到 network 状态
-    updateCanvasHint(true);
+    // 从 localStorage 恢复图谱并重绘画布
+    const count = SceneGraph.getObjectCount();
+    if (count > 0) {
+      redrawCanvas();
+      updateCanvasHint(false);
+      addLog('📂', `已恢复 ${count} 个图形`);
+    } else {
+      updateCanvasHint(true);
+    }
+    updateToolDisplay();
 
-    console.log('[App] 初始化完成');
+    console.log('[App] 初始化完成 (图形数:', count, ')');
     addLog('💡', '系统就绪，点击麦克风按钮开始绘画');
   }
 
