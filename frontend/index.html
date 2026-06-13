@@ -7,47 +7,91 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- ========== 头栏 ========== -->
-  <header id="toolbar">
-    <button id="micBtn" class="mic-btn" title="点击开始/停止聆听">
-      <span class="mic-icon">🎤</span>
-      <span class="mic-text">开始聆听</span>
-    </button>
+  <div id="app">
+    <!-- ========== 左侧功能面板 ========== -->
+    <aside id="sidebar">
+      <div class="sidebar-header">🎨 AI语音绘图</div>
 
-    <div id="statusIndicator" class="status-indicator status-idle">
-      <span class="status-dot"></span>
-      <span class="status-text">就绪</span>
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">基本形状</div>
+        <ul class="sidebar-list">
+          <li><span class="feature-icon">🔵</span> 圆形</li>
+          <li><span class="feature-icon">🟦</span> 矩形</li>
+          <li><span class="feature-icon">🔺</span> 三角形</li>
+          <li><span class="feature-icon">📏</span> 直线</li>
+          <li><span class="feature-icon">🟡</span> 椭圆</li>
+          <li><span class="feature-icon">⭐</span> 五角星</li>
+          <li><span class="feature-icon">❤️</span> 心形</li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">复合图形</div>
+        <ul class="sidebar-list">
+          <li><span class="feature-icon">☀️</span> 太阳</li>
+          <li><span class="feature-icon">🏠</span> 房子</li>
+          <li><span class="feature-icon">🌳</span> 树</li>
+          <li><span class="feature-icon">🌸</span> 花</li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">操作指令</div>
+        <ul class="sidebar-list">
+          <li><span class="feature-icon">🧹</span> 清空画布</li>
+          <li><span class="feature-icon">🔧</span> 实心 / 空心</li>
+          <li><span class="feature-icon">🎨</span> 指定颜色</li>
+          <li><span class="feature-icon">📐</span> 空间关联</li>
+        </ul>
+      </div>
+
+    </aside>
+
+    <!-- ========== 主区域 ========== -->
+    <div id="mainArea">
+      <!-- 头栏 -->
+      <header id="toolbar">
+        <button id="micBtn" class="mic-btn" title="点击开始/停止聆听">
+          <span class="mic-icon">🎤</span>
+          <span class="mic-text">开始聆听</span>
+        </button>
+
+        <div id="statusIndicator" class="status-indicator status-idle">
+          <span class="status-dot"></span>
+          <span class="status-text">就绪</span>
+        </div>
+
+        <div class="toolbar-spacer"></div>
+
+        <div id="currentTool" class="tool-state">
+          <span class="tool-label">颜色:</span>
+          <span id="colorSwatch" class="color-swatch" style="background:#000000"></span>
+          <span class="tool-label">粗细:</span>
+          <span id="strokeDisplay">3</span>
+          <span class="tool-label">填充:</span>
+          <span id="fillDisplay">否</span>
+        </div>
+
+        <button id="clearBtn" class="clear-btn" title="清空画布（也可说"清空"）">清空</button>
+      </header>
+
+      <!-- Canvas 画布区 -->
+      <main id="canvasArea">
+        <div id="canvasWrapper">
+          <canvas id="drawCanvas" width="1100" height="700"></canvas>
+          <div id="canvasHint" class="canvas-hint">🎤 点击麦克风按钮，开始说话绘画</div>
+        </div>
+      </main>
+
+      <!-- 识别显示区 -->
+      <footer id="recognitionPanel">
+        <div id="interimText" class="interim-text"></div>
+        <div id="logArea" class="log-area">
+          <div class="log-placeholder">等待语音输入...</div>
+        </div>
+      </footer>
     </div>
-
-    <div class="toolbar-spacer"></div>
-
-    <div id="currentTool" class="tool-state">
-      <span class="tool-label">颜色:</span>
-      <span id="colorSwatch" class="color-swatch" style="background:#000000"></span>
-      <span class="tool-label">粗细:</span>
-      <span id="strokeDisplay">3</span>
-      <span class="tool-label">填充:</span>
-      <span id="fillDisplay">否</span>
-    </div>
-
-    <button id="clearBtn" class="clear-btn" title="清空画布（也可说"清空"）">清空</button>
-  </header>
-
-  <!-- ========== Canvas 画布区 ========== -->
-  <main id="canvasArea">
-    <div id="canvasWrapper">
-      <canvas id="drawCanvas" width="1100" height="700"></canvas>
-      <div id="canvasHint" class="canvas-hint">🎤 点击麦克风按钮，开始说话绘画</div>
-    </div>
-  </main>
-
-  <!-- ========== 识别显示区 ========== -->
-  <footer id="recognitionPanel">
-    <div id="interimText" class="interim-text"></div>
-    <div id="logArea" class="log-area">
-      <div class="log-placeholder">等待语音输入...</div>
-    </div>
-  </footer>
+  </div>
 
   <!-- ========== 脚本加载 ========== -->
   <script src="js/speech/recognizer.js"></script>

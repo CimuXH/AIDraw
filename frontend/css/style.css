@@ -7,6 +7,7 @@
   --bg-primary: #1a1a2e;
   --bg-secondary: #16213e;
   --bg-tertiary: #0f3460;
+  --bg-sidebar: #111827;
   --bg-canvas-area: #2a2a3e;
   --text-primary: #e0e0e0;
   --text-secondary: #a0a0b0;
@@ -35,6 +36,107 @@ html, body {
                "Microsoft YaHei", sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
+}
+
+/* ---------- 根布局：侧边栏 + 主区域 ---------- */
+#app {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+}
+
+/* ============================================
+   侧边栏
+   ============================================ */
+#sidebar {
+  width: 160px;
+  min-width: 160px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+.sidebar-header {
+  padding: 12px 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.sidebar-section {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.sidebar-section-title {
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.sidebar-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-list li {
+  padding: 4px 10px 4px 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.15s;
+  cursor: default;
+}
+
+.sidebar-list li:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--text-primary);
+}
+
+.feature-icon {
+  width: 20px;
+  text-align: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* 示例指令样式 */
+.example-list li {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 3px 16px;
+}
+
+.example-list li::before {
+  content: "💬";
+  font-style: normal;
+  font-size: 10px;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   主区域（头栏 + Canvas + 识别面板）
+   ============================================ */
+#mainArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* 防止 flex 子元素溢出 */
 }
 
 /* ---------- 头栏 ---------- */
@@ -158,12 +260,13 @@ html, body {
   align-items: center;
   justify-content: center;
   background: var(--bg-canvas-area);
-  overflow: hidden;
+  overflow: auto;
 }
 
 #canvasWrapper {
   position: relative;
   box-shadow: var(--shadow);
+  flex-shrink: 0;
 }
 
 #drawCanvas {
@@ -227,15 +330,17 @@ html, body {
 .log-entry .log-icon { flex-shrink: 0; width: 20px; text-align: center; }
 .log-entry .log-text { flex: 1; word-break: break-all; }
 
-/* ---------- 布局 ---------- */
-body {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+/* ---------- 响应式 ---------- */
+@media (max-width: 1024px) {
+  #sidebar {
+    width: 180px;
+    min-width: 180px;
+  }
+  .sidebar-list li { font-size: 12px; padding: 3px 10px; }
 }
 
-/* ---------- 响应式 ---------- */
 @media (max-width: 860px) {
+  #sidebar { display: none; }
   #toolbar { gap: 8px; padding: 0 8px; }
   .tool-state { display: none; }
   #recognitionPanel { height: 100px; }

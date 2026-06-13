@@ -9,12 +9,12 @@ import (
 
 	"aidraw-server/llm"
 
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
 // ============================================================
-// WebSocket 处理器
-// 管理连接、收发消息、调用 NLU
+// WebSocket 处理器（基于 gin 框架）
 // ============================================================
 
 var upgrader = websocket.Upgrader{
@@ -49,10 +49,10 @@ func NewHub() *Hub {
 	}
 }
 
-// WSHandler 返回 WebSocket 处理函数
-func (h *Hub) WSHandler(llmClient *llm.Client) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		conn, err := upgrader.Upgrade(w, r, nil)
+// WSHandler 返回 gin 的 WebSocket 处理函数
+func (h *Hub) WSHandler(llmClient *llm.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
 			log.Printf("[WS] 升级连接失败: %v", err)
 			return
@@ -152,7 +152,6 @@ func (h *Hub) handleNLURequest(conn *websocket.Conn, msg *WSMessage, llmClient *
 		time.Since(startTime).Seconds(), len(result.Commands),
 		truncate(string(commandsJSON), 200))
 
-	// 如果延迟超3000ms，提示一下
 	if latency > 3000 {
 		log.Printf("[NLU] ⚠️ 延迟较高: %dms", latency)
 	}
