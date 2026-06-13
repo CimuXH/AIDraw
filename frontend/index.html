@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 语音绘图工具</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- ========== 头栏 ========== -->
+  <header id="toolbar">
+    <button id="micBtn" class="mic-btn" title="点击开始/停止聆听">
+      <span class="mic-icon">🎤</span>
+      <span class="mic-text">开始聆听</span>
+    </button>
+
+    <div id="statusIndicator" class="status-indicator status-idle">
+      <span class="status-dot"></span>
+      <span class="status-text">就绪</span>
+    </div>
+
+    <div class="toolbar-spacer"></div>
+
+    <div id="currentTool" class="tool-state">
+      <span class="tool-label">颜色:</span>
+      <span id="colorSwatch" class="color-swatch" style="background:#000000"></span>
+      <span class="tool-label">粗细:</span>
+      <span id="strokeDisplay">3</span>
+      <span class="tool-label">填充:</span>
+      <span id="fillDisplay">否</span>
+    </div>
+
+    <button id="clearBtn" class="clear-btn" title="清空画布（也可说"清空"）">清空</button>
+  </header>
+
+  <!-- ========== Canvas 画布区 ========== -->
+  <main id="canvasArea">
+    <div id="canvasWrapper">
+      <canvas id="drawCanvas" width="1100" height="700"></canvas>
+      <div id="canvasHint" class="canvas-hint">🎤 点击麦克风按钮，开始说话绘画</div>
+    </div>
+  </main>
+
+  <!-- ========== 识别显示区 ========== -->
+  <footer id="recognitionPanel">
+    <div id="interimText" class="interim-text"></div>
+    <div id="logArea" class="log-area">
+      <div class="log-placeholder">等待语音输入...</div>
+    </div>
+  </footer>
+
+  <!-- ========== 脚本加载 ========== -->
+  <script src="js/speech/recognizer.js"></script>
+  <script src="js/speech/synthesizer.js"></script>
+  <script src="js/drawing/canvas.js"></script>
+  <script src="js/drawing/shapes.js"></script>
+  <script src="js/drawing/history.js"></script>
+  <script src="js/state/state.js"></script>
+  <script src="js/network.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

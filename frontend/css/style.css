@@ -1,0 +1,242 @@
+/* ============================================
+   AI 语音绘图工具 — 深色主题样式
+   ============================================ */
+
+/* ---------- CSS 变量 ---------- */
+:root {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --bg-tertiary: #0f3460;
+  --bg-canvas-area: #2a2a3e;
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0b0;
+  --text-muted: #606070;
+  --accent-green: #00e676;
+  --accent-yellow: #ffab00;
+  --accent-orange: #ff6d00;
+  --accent-red: #ff1744;
+  --accent-blue: #448aff;
+  --border-color: #333355;
+  --shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* ---------- 全局重置 ---------- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+               "Microsoft YaHei", sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ---------- 头栏 ---------- */
+#toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 48px;
+  padding: 0 16px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+/* 麦克风按钮 */
+.mic-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border: 2px solid var(--accent-green);
+  border-radius: 24px;
+  background: transparent;
+  color: var(--accent-green);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.mic-btn:hover {
+  background: rgba(0,230,118,0.1);
+}
+.mic-btn.listening {
+  background: var(--accent-green);
+  color: #000;
+  border-color: var(--accent-green);
+  animation: micPulse 1.5s infinite;
+}
+.mic-btn.processing {
+  border-color: var(--accent-orange);
+  color: var(--accent-orange);
+}
+
+@keyframes micPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,230,118,0.4); }
+  50%      { box-shadow: 0 0 0 8px rgba(0,230,118,0); }
+}
+
+.mic-icon { font-size: 18px; }
+
+/* 状态指示器 */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: background 0.3s;
+}
+.status-idle    .status-dot { background: var(--text-muted); }
+.status-listening .status-dot { background: var(--accent-green); animation: dotPulse 1s infinite; }
+.status-processing .status-dot { background: var(--accent-orange); animation: dotSpin 0.8s infinite; }
+.status-error   .status-dot { background: var(--accent-red); }
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}
+@keyframes dotSpin {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.2; }
+  100% { opacity: 1; }
+}
+
+/* 工具栏间隔 */
+.toolbar-spacer { flex: 1; }
+
+/* 工具状态显示 */
+.tool-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.tool-label { color: var(--text-muted); }
+.color-swatch {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid var(--border-color);
+}
+
+/* 清空按钮 */
+.clear-btn {
+  padding: 4px 12px;
+  border: 1px solid var(--accent-red);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--accent-red);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.clear-btn:hover {
+  background: rgba(255,23,68,0.1);
+}
+
+/* ---------- Canvas 区域 ---------- */
+#canvasArea {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-canvas-area);
+  overflow: hidden;
+}
+
+#canvasWrapper {
+  position: relative;
+  box-shadow: var(--shadow);
+}
+
+#drawCanvas {
+  display: block;
+  background: #ffffff;
+}
+
+.canvas-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #c0c0c0;
+  font-size: 16px;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+}
+
+/* ---------- 底部识别面板 ---------- */
+#recognitionPanel {
+  height: 120px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.interim-text {
+  padding: 6px 16px;
+  font-size: 14px;
+  color: var(--text-muted);
+  font-style: italic;
+  min-height: 26px;
+  line-height: 1.4;
+}
+.interim-text.active {
+  color: var(--text-secondary);
+}
+
+.log-area {
+  flex: 1;
+  padding: 4px 16px 8px;
+  overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+.log-placeholder {
+  color: var(--text-muted);
+  text-align: center;
+  padding-top: 12px;
+}
+
+.log-entry {
+  display: flex;
+  gap: 8px;
+  padding: 2px 0;
+}
+.log-entry .log-icon { flex-shrink: 0; width: 20px; text-align: center; }
+.log-entry .log-text { flex: 1; word-break: break-all; }
+
+/* ---------- 布局 ---------- */
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 860px) {
+  #toolbar { gap: 8px; padding: 0 8px; }
+  .tool-state { display: none; }
+  #recognitionPanel { height: 100px; }
+}
