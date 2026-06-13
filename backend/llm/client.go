@@ -185,18 +185,14 @@ func (c *Client) buildSystemPrompt() string {
 - drawEllipse: x(中心x), y(中心y), radiusX(X半径), radiusY(Y半径), color, fill, strokeWidth
 - drawStar: x(中心x), y(中心y), outerRadius(外径), innerRadius(内径), points(角数,默认5), color, fill, strokeWidth
 - drawHeart: x(中心x), y(中心y), size(大小), color, fill, strokeWidth
-- drawArrow: x1, y1, x2, y2, color, strokeWidth
 
 ### 复合图形（由多个基本形状组成，前端自动组装）
 - drawSun: x(中心x), y(中心y), radius(半径), color
 - drawHouse: x(左上角x), y(左上角y), width(宽), height(高), color
 - drawTree: x(中心x), y(底部y), height(高), color
 - drawFlower: x(中心x), y(中心y), size(大小), color
-- drawSmileFace: x(中心x), y(中心y), radius(半径), color
 
-### 修改操作
-- modifyObject: targetLabel(要修改的图形描述), changes(对象,含要修改的字段如color/fill/size)
-- deleteObject: targetLabel(要删除的图形描述)
+### 其他操作
 - clearCanvas: 无额外参数
 
 ### 兜底
@@ -232,12 +228,6 @@ func (c *Client) buildSystemPrompt() string {
 用户："在正方形右边画一个三角形"
 （假设场景中有正方形在 x:350,y:250,w:100,h:100，右边界=450）
 输出：{"commands":[{"action":"drawTriangle","label":"三角形(正方形右边)","x":520,"y":300,"size":80,"fill":false}]}
-
-用户："把那个红色的圆涂成蓝色"
-输出：{"commands":[{"action":"modifyObject","targetLabel":"红色圆","changes":{"color":"#0000FF"}}]}
-
-用户："删掉那个三角形"
-输出：{"commands":[{"action":"deleteObject","targetLabel":"三角形"}]}
 
 用户："你好"
 输出：{"commands":[{"action":"unknown"}]}`

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -10,13 +9,14 @@ import (
 	"aidraw-server/config"
 	"aidraw-server/handler"
 	"aidraw-server/llm"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	// 加载配置
 	cfgPath := filepath.Join(".env")
 	if _, err := os.Stat(cfgPath); os.IsNotExist(err) {
-		// 尝试从 backend 目录查找
 		cfgPath = filepath.Join("backend", ".env")
 	}
 	cfg := config.Load(cfgPath)
@@ -34,18 +34,20 @@ func main() {
 	// 创建 WebSocket Hub
 	hub := handler.NewHub()
 
-	// 路由
-	http.HandleFunc("/ws", hub.WSHandler(llmClient))
+	// 创建 gin 路由
+	router := gin.Default()
+
+	// WebSocket 路由
+	router.GET("/ws", hub.WSHandler(llmClient))
 
 	// 静态文件服务 — 前端资源
 	frontendPath := filepath.Join("..", "frontend")
 	if _, err := os.Stat(frontendPath); os.IsNotExist(err) {
-		// 如果从 backend 目录运行，尝试其他路径
 		frontendPath = filepath.Join("frontend")
 	}
 	if info, err := os.Stat(frontendPath); err == nil && info.IsDir() {
-		fs := http.FileServer(http.Dir(frontendPath))
-		http.Handle("/", fs)
+		// 用 NoRoute 避免通配符 /*filepath 与 /ws 冲突
+		router.NoRoute(gin.WrapH(http.FileServer(http.Dir(frontendPath))))
 		log.Printf("📁 静态文件服务: %s", frontendPath)
 	} else {
 		log.Printf("⚠️  未找到前端目录，仅提供 WebSocket 服务")
@@ -55,8 +57,7 @@ func main() {
 	log.Printf("🚀 服务启动: http://localhost%s", addr)
 	log.Printf("   WebSocket: ws://localhost%s/ws", addr)
 
-	if err := http.ListenAndServe(addr, nil); err != nil {
+	if err := router.Run(addr); err != nil {
 		log.Fatalf("服务启动失败: %v", err)
 	}
-	fmt.Scanln()
 }
