@@ -4,7 +4,7 @@
 
 #### 工具介绍
 
-视频介绍链接：
+视频介绍链接：【ai语音绘图工具】 https://www.bilibili.com/video/BV1oCJw6JELx/?share_source=copy_web&vd_source=f8c146a8da6b89157072e234e1c1a7b7
 
 系统通过语音识别实现简单的图形绘制，删除等功能。
 
