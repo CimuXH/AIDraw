@@ -192,6 +192,8 @@ const App = (() => {
       'drawflower': 'drawFlower', 'flower': 'drawFlower', '花': 'drawFlower',
       // 其他
       'clearcanvas': 'clearCanvas', 'clear': 'clearCanvas', '清空': 'clearCanvas',
+      'deleteobject': 'deleteObject', 'delete': 'deleteObject', 'remove': 'deleteObject',
+      '删除': 'deleteObject', '移除': 'deleteObject', '去掉': 'deleteObject',
       'unknown': 'unknown',
     };
     // 去掉空格、下划线、连字符后小写匹配
@@ -210,6 +212,7 @@ const App = (() => {
     if (key.includes('tree') || key.includes('树')) return 'drawTree';
     if (key.includes('flower') || key.includes('花')) return 'drawFlower';
     if (key.includes('clear') || key.includes('清空') || key.includes('清除')) return 'clearCanvas';
+    if (key.includes('delete') || key.includes('删') || key.includes('去除') || key.includes('移除')) return 'deleteObject';
     return 'unknown';
   }
 
@@ -384,6 +387,25 @@ const App = (() => {
         addLog('🧹', '清空画布');
         SceneGraph.clear();
         break;
+
+      case 'deleteObject': {
+        // 优先用 targetId 精确匹配，targetLabel 兜底
+        let target = cmd.targetId ? SceneGraph.findById(cmd.targetId) : null;
+        if (!target) {
+          const keyword = cmd.targetLabel || cmd.label || '';
+          const targets = SceneGraph.findByLabel(keyword);
+          target = targets.length > 0 ? targets[0] : null;
+        }
+        if (target) {
+          SceneGraph.removeObject(target.id);
+          addLog('🗑️', `已删除: ${target.label} (${target.type})`);
+        } else {
+          const fallback = cmd.targetLabel || cmd.label || '那个图形';
+          addLog('⚠️', `未找到图形: "${fallback}"`);
+          SpeechSynthesizer.speak(`没找到${fallback}`);
+        }
+        break;
+      }
 
       case 'unknown':
         addLog('🤷', '无法识别的指令');
@@ -625,6 +647,7 @@ const App = (() => {
       case 'drawTree': return `已画好${cmd.label || '树'}`;
       case 'drawFlower': return `已画好${cmd.label || '花'}`;
       case 'clearCanvas': return '画布已清空';
+      case 'deleteObject': return `已删除${cmd.label || cmd.targetLabel || '图形'}`;
       default: return '已完成';
     }
   }

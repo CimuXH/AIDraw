@@ -57,6 +57,7 @@ type DrawCommand struct {
 	Fill        *bool                  `json:"fill,omitempty"`
 	StrokeWidth int                    `json:"strokeWidth,omitempty"`
 	TargetLabel string                 `json:"targetLabel,omitempty"`
+	TargetId    string                 `json:"targetId,omitempty"`
 	Changes     map[string]interface{} `json:"changes,omitempty"`
 }
 
@@ -194,6 +195,7 @@ func (c *Client) buildSystemPrompt() string {
 
 ### 其他操作
 - clearCanvas: 无额外参数
+- deleteObject: targetId(要删除的图形 id，必须从场景上下文中某个图形的括号内 id 复制，例如 "obj_001")，同时填写 targetLabel 作为兜底。如场景中有 label 为"红色圆"id 为"obj_001"的图形，用户说"删除红色的圆"时 targetId="obj_001", targetLabel="红色圆"
 
 ### 兜底
 - unknown: 无法识别时使用
@@ -228,6 +230,10 @@ func (c *Client) buildSystemPrompt() string {
 用户："在正方形右边画一个三角形"
 （假设场景中有正方形在 x:350,y:250,w:100,h:100，右边界=450）
 输出：{"commands":[{"action":"drawTriangle","label":"三角形(正方形右边)","x":520,"y":300,"size":80,"fill":false}]}
+
+用户："删除左上角红色的圆"
+（假设场景中有图形 id:"obj_001" label:"红色圆" 中心(150,130) 和 id:"obj_002" label:"红色圆" 中心(800,130)，用户指定左上角即 x 较小的那个）
+输出：{"commands":[{"action":"deleteObject","targetId":"obj_001","targetLabel":"红色圆","label":"左上角红色圆"}]}
 
 用户："你好"
 输出：{"commands":[{"action":"unknown"}]}`
